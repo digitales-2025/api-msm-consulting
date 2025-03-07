@@ -19,6 +19,7 @@ model User {
   password  String
   name      String
   roles     String[] @default(["user"])
-  createdAt DateTime @default(now())
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt
 }
