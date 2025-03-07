@@ -40,7 +40,9 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  document.tags = [];
+  document.tags = [
+    { name: 'Auth', description: 'Endpoints related to authentication' },
+  ];
 
   SwaggerModule.setup('api', app, document);
 
