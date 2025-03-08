@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import * as argon2 from 'argon2';
 import { PrismaService } from '../../../shared/database/prisma/prisma.service';
 import { UserMapper } from '../../../shared/mappers/user-mapper';
+import { User } from '../entities/user.entity';
 import { IUserRepository } from '../interfaces/user-repository.interface';
 
 @Injectable()
@@ -41,9 +42,18 @@ export class UserRepository implements IUserRepository {
   }
 
   async create(
-    userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>,
+    userData: Omit<User, 'id' | 'isActive' | 'createdAt' | 'updatedAt'>,
   ): Promise<User> {
-    const data = this.userMapper.toPersistence(userData);
+    const data = this.userMapper.toPersistence(userData) as User;
+    const userExists = await this.findByEmail(data.email);
+
+    if (userExists) {
+      throw new BadRequestException('La usuario ya existe');
+    }
+
+    const hashedPassword = await argon2.hash(data.password);
+
+    data.password = hashedPassword;
 
     const user = await this.prisma.user.create({
       data,
