@@ -121,6 +121,8 @@ export class AuthController {
       throw new BadRequestException('Credenciales inválidas');
     }
 
+    // This use case should be storing the refresh token in the database
+    // while returning both tokens to be used in the response
     const tokens = await this.generateTokensUseCase.execute(
       user.id as string,
       user.email as string,
