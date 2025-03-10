@@ -5,6 +5,7 @@ import { ValidateRefreshTokenUseCase } from '@/application/use-cases/auth/valida
 import { GetUser } from '@/gateway/decorators/user.decorator';
 import { JwtAuthGuard } from '@/gateway/guards/jwt-auth.guard';
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpCode,
@@ -117,10 +118,7 @@ export class AuthController {
     const user = await this.authenticateUserUseCase.execute(email, password);
 
     if (!user) {
-      return {
-        message: 'Credenciales inválidas',
-        statusCode: HttpStatus.UNAUTHORIZED,
-      };
+      throw new BadRequestException('Credenciales inválidas');
     }
 
     const tokens = await this.generateTokensUseCase.execute(
