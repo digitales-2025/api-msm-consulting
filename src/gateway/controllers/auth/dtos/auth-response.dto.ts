@@ -42,18 +42,4 @@ export class AuthResponseDto {
     required: false,
   })
   roles?: string[];
-
-  @ApiProperty({
-    description: 'Token de acceso JWT',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: false,
-  })
-  accessToken?: string;
-
-  @ApiProperty({
-    description: 'Token de actualización para renovar el token de acceso',
-    example: '7a6c5f9d5e7b8e1d4c8e7a6c...',
-    required: false,
-  })
-  refreshToken?: string;
 }
