@@ -13,10 +13,8 @@ export class ValidateRefreshTokenUseCase {
   async execute(refreshToken: string): Promise<any> {
     // Hash del token para compararlo con el almacenado
     const hashedToken = this.hashToken(refreshToken);
-
     // Buscar usuario con este token
     const user = await this.userRepository.findByRefreshToken(hashedToken);
-
     if (!user) {
       throw new UnauthorizedException('Invalid refresh token');
     }

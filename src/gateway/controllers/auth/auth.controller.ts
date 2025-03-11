@@ -8,8 +8,11 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
+  HttpException,
   HttpStatus,
+  InternalServerErrorException,
   Logger,
   Post,
   Req,
@@ -106,37 +109,41 @@ export class AuthController {
       'Devuelve los datos del usuario autenticado y establece cookies para los tokens',
     type: AuthResponseDto,
   })
+  // En el método login
   async login(
     @Body() signInDto: SignInDto,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponseDto> {
-    const { email, password } = signInDto;
+    try {
+      const { email, password } = signInDto;
 
-    const user = await this.authenticateUserUseCase.execute(email, password);
+      const user = await this.authenticateUserUseCase.execute(email, password);
 
-    if (!user) {
-      throw new BadRequestException('Credenciales inválidas');
+      if (!user) {
+        throw new BadRequestException('Credenciales inválidas');
+      }
+
+      const tokens = await this.generateTokensUseCase.execute(
+        user.id as string,
+        user.email as string,
+        user.roles as string[],
+      );
+      // Establecer cookies con los tokens
+      this.setTokenCookies(response, tokens.accessToken, tokens.refreshToken);
+
+      return {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        roles: user.roles,
+        statusCode: HttpStatus.OK,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error processing login');
     }
-
-    // This use case should be storing the refresh token in the database
-    // while returning both tokens to be used in the response
-    const tokens = await this.generateTokensUseCase.execute(
-      user.id as string,
-      user.email as string,
-      user.roles as string[],
-    );
-
-    // Establecer cookies con los tokens
-    this.setTokenCookies(response, tokens.accessToken, tokens.refreshToken);
-
-    // Devolver solo información del usuario (sin los tokens en el cuerpo)
-    return {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      roles: user.roles,
-      statusCode: HttpStatus.OK,
-    };
   }
 
   @Post('refresh')
@@ -150,14 +157,13 @@ export class AuthController {
     type: AuthResponseDto,
   })
   async refreshToken(
-    @Body() refreshTokenDto: RefreshTokenDto,
+    @Body() body: RefreshTokenDto,
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponseDto> {
     try {
       // Intentamos usar primero la cookie, luego el cuerpo de la solicitud
-      const refreshToken =
-        request.cookies?.refresh_token || refreshTokenDto.refreshToken;
+      const refreshToken = request.cookies?.refresh_token || body.refreshToken;
       if (!refreshToken) {
         throw new Error('No refresh token provided');
       }
@@ -166,6 +172,7 @@ export class AuthController {
       const user = await this.validateRefreshTokenUseCase.execute(
         refreshToken as string,
       );
+      console.log('🚀 ~ AuthController ~ user:', user);
 
       // Generar nuevos tokens
       const tokens = await this.generateTokensUseCase.execute(
@@ -173,7 +180,6 @@ export class AuthController {
         user.email as string,
         user.roles as string[],
       );
-
       // Establecer nuevas cookies con los tokens actualizados
       this.setTokenCookies(response, tokens.accessToken, tokens.refreshToken);
 
@@ -207,7 +213,6 @@ export class AuthController {
     @GetUser('id') userId: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponseDto> {
-    console.log('🚀 ~ AuthController ~ userId:', userId);
     await this.invalidateTokensUseCase.execute(userId);
 
     // Eliminar las cookies
@@ -215,6 +220,26 @@ export class AuthController {
 
     return {
       message: 'Sesión cerrada exitosamente',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  @Get('me')
+  @Auth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Obtener información del usuario autenticado' })
+  @ApiResponse({
+    status: 200,
+    description: 'Devuelve la información del usuario autenticado',
+    type: AuthResponseDto,
+  })
+  me(@GetUser() user: any): AuthResponseDto {
+    return {
+      message: 'Usuario autenticado',
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      roles: user.roles,
       statusCode: HttpStatus.OK,
     };
   }

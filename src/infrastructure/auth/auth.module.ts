@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { PersistenceModule } from '../persistence/persistence.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
     PersistenceModule, // Para acceder al UserRepository
   ],
-  providers: [JwtStrategy],
-  exports: [PassportModule, JwtModule, JwtStrategy],
+  providers: [JwtStrategy, RefreshTokenStrategy],
+  exports: [PassportModule, JwtModule, JwtStrategy, RefreshTokenStrategy],
 })
 export class AuthModule {}
