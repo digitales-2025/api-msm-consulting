@@ -2,8 +2,8 @@ import { AuthenticateUserUseCase } from '@/application/use-cases/auth/auth-users
 import { GenerateTokensUseCase } from '@/application/use-cases/auth/generate-token.use-case';
 import { InvalidateTokensUseCase } from '@/application/use-cases/auth/invalidate-token.use-case';
 import { ValidateRefreshTokenUseCase } from '@/application/use-cases/auth/validate-refresh-token.use-case';
+import { Auth } from '@/gateway/decorators/auth.decorator';
 import { GetUser } from '@/gateway/decorators/user.decorator';
-import { JwtAuthGuard } from '@/gateway/guards/jwt-auth.guard';
 import {
   BadRequestException,
   Body,
@@ -14,7 +14,6 @@ import {
   Post,
   Req,
   Res,
-  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -159,17 +158,13 @@ export class AuthController {
   ): Promise<AuthResponseDto> {
     try {
       // Intentamos usar primero la cookie, luego el cuerpo de la solicitud
-      const refreshToken =
-        request.cookies?.refresh_token || refreshTokenDto.refreshToken;
-
+      const refreshToken = refreshTokenDto.refreshToken;
       if (!refreshToken) {
         throw new Error('No refresh token provided');
       }
 
       // Validar el refresh token
-      const user = await this.validateRefreshTokenUseCase.execute(
-        refreshToken as string,
-      );
+      const user = await this.validateRefreshTokenUseCase.execute(refreshToken);
 
       // Generar nuevos tokens
       const tokens = await this.generateTokensUseCase.execute(
@@ -191,8 +186,6 @@ export class AuthController {
       };
     } catch (error) {
       this.logger.error(error.message);
-      // Limpiar cookies en caso de error
-      this.clearTokenCookies(response);
       return {
         message: 'Token inválido o expirado',
         statusCode: HttpStatus.UNAUTHORIZED,
@@ -201,7 +194,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
+  @Auth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Cerrar sesión' })
   @ApiResponse({
