@@ -55,7 +55,6 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV !== 'development', // HTTPS en producción
       sameSite: 'strict',
-      path: '/auth/refresh', // Sólo disponible para el endpoint de refresh
       maxAge: this.getRefreshTokenMaxAge(), // Duración más larga
     });
   }
@@ -72,7 +71,6 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV !== 'development',
       sameSite: 'strict',
-      path: '/auth/refresh',
       maxAge: 0,
     });
   }
@@ -158,13 +156,16 @@ export class AuthController {
   ): Promise<AuthResponseDto> {
     try {
       // Intentamos usar primero la cookie, luego el cuerpo de la solicitud
-      const refreshToken = refreshTokenDto.refreshToken;
+      const refreshToken =
+        request.cookies?.refresh_token || refreshTokenDto.refreshToken;
       if (!refreshToken) {
         throw new Error('No refresh token provided');
       }
 
       // Validar el refresh token
-      const user = await this.validateRefreshTokenUseCase.execute(refreshToken);
+      const user = await this.validateRefreshTokenUseCase.execute(
+        refreshToken as string,
+      );
 
       // Generar nuevos tokens
       const tokens = await this.generateTokensUseCase.execute(
@@ -206,6 +207,7 @@ export class AuthController {
     @GetUser('id') userId: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponseDto> {
+    console.log('🚀 ~ AuthController ~ userId:', userId);
     await this.invalidateTokensUseCase.execute(userId);
 
     // Eliminar las cookies
