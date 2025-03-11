@@ -1,45 +1,18 @@
 import { USER_REPOSITORY } from '@/domain/repositories/repositories.providers';
 import { IUserRepository } from '@/domain/repositories/user.repository';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class GenerateTokensUseCase {
-  private readonly logger = new Logger(GenerateTokensUseCase.name);
-
-  // Caché para prevenir ejecuciones duplicadas
-  private executionLocks: Map<
-    string,
-    {
-      timestamp: number;
-      promise: Promise<{
-        accessToken: string;
-        refreshToken: string;
-      }>;
-    }
-  > = new Map();
-  private readonly LOCK_TIMEOUT = 2000; // 2 segundos
-
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
     @Inject(USER_REPOSITORY)
     private userRepository: IUserRepository,
-  ) {
-    // Limpieza periódica de bloqueos antiguos
-    setInterval(() => this.cleanupLocks(), 30000);
-  }
-
-  private cleanupLocks(): void {
-    const now = Date.now();
-    this.executionLocks.forEach((value, key) => {
-      if (now - value.timestamp > this.LOCK_TIMEOUT) {
-        this.executionLocks.delete(key);
-      }
-    });
-  }
+  ) {}
 
   async execute(
     id: string,
@@ -49,99 +22,31 @@ export class GenerateTokensUseCase {
     accessToken: string;
     refreshToken: string;
   }> {
-    const lockKey = `token_${id}`;
-    const executionId = Date.now().toString().slice(-6);
+    // Generar access token
+    const accessToken = this.generateAccessToken(id, email, roles);
 
-    this.logger.log(
-      `⚠️ [${executionId}] Intento de generar tokens para: ${id}`,
-    );
+    // Generar refresh token
+    const refreshToken = this.generateRefreshToken();
 
-    // Si ya hay una ejecución en curso para este usuario, usar esa
-    const existingLock = this.executionLocks.get(lockKey);
-    if (
-      existingLock &&
-      Date.now() - existingLock.timestamp < this.LOCK_TIMEOUT
-    ) {
-      this.logger.log(
-        `🔒 [${executionId}] Reusando promesa existente para: ${id}`,
-      );
-      return existingLock.promise;
+    // Guardar refresh token hasheado en DB
+    const hashedRefreshToken = this.hashToken(refreshToken);
+
+    // Get the current user
+    const user = await this.userRepository.findById(id);
+    console.log('🚀 ~ GenerateTokensUseCase ~ user:', user);
+    if (!user) {
+      throw new Error(`User with id ${id} not found`);
     }
+    // Update only the refresh token
+    user.refreshToken = hashedRefreshToken;
+    await this.userRepository.update(id, user);
 
-    // Crear nueva promesa de ejecución
-    const tokenPromise = this._generateTokens(id, email, roles, executionId);
-
-    // Guardar la promesa en el mapa de bloqueos
-    this.executionLocks.set(lockKey, {
-      timestamp: Date.now(),
-      promise: tokenPromise,
-    });
-
-    // Limpiar el bloqueo después de completarse
-    tokenPromise.finally(() => {
-      setTimeout(() => {
-        this.executionLocks.delete(lockKey);
-      }, this.LOCK_TIMEOUT);
-    });
-
-    return tokenPromise;
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
-  // Método interno real que genera los tokens
-  private async _generateTokens(
-    id: string,
-    email: string,
-    roles: string[],
-    executionId: string,
-  ): Promise<{
-    accessToken: string;
-    refreshToken: string;
-  }> {
-    try {
-      this.logger.log(`📝 [${executionId}] Generando tokens para: ${id}`);
-
-      // Generar access token
-      const accessToken = this.generateAccessToken(id, email, roles);
-
-      // Generar refresh token
-      const refreshToken = this.generateRefreshToken();
-      this.logger.log(
-        `🔑 [${executionId}] Token generado: ${refreshToken.substring(0, 8)}...`,
-      );
-
-      // Guardar refresh token hasheado en DB
-      const hashedRefreshToken = this.hashToken(refreshToken);
-      this.logger.log(
-        `💾 [${executionId}] Hash guardado: ${hashedRefreshToken.substring(0, 8)}...`,
-      );
-
-      // Get the current user
-      const user = await this.userRepository.findById(id);
-      if (!user) {
-        throw new Error(`User with id ${id} not found`);
-      }
-
-      // Update only the refresh token
-      user.refreshToken = hashedRefreshToken;
-      await this.userRepository.update(id, user);
-
-      this.logger.log(
-        `✅ [${executionId}] Tokens generados correctamente para: ${id}`,
-      );
-
-      return {
-        accessToken,
-        refreshToken,
-      };
-    } catch (error) {
-      this.logger.error(
-        `❌ [${executionId}] Error generando tokens: ${error.message}`,
-      );
-      throw error;
-    }
-  }
-
-  // Métodos existentes sin cambios
   private generateAccessToken(
     userId: string,
     email: string,
