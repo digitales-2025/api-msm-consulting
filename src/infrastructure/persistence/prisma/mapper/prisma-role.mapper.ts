@@ -13,12 +13,15 @@ export class PrismaRoleMapper {
   }
 
   static toPrisma(role: Role): Prisma.RoleUncheckedCreateInput {
+    // Excluir permissions para evitar conflicto de tipos con Prisma
+    const { permissions: _permissions, ...roleData } = role as any;
+
     return {
-      id: role.id,
-      name: role.name,
-      description: role.description,
-      createdAt: role.createdAt,
-      updatedAt: role.updatedAt,
+      id: roleData.id || undefined,
+      name: roleData.name,
+      description: roleData.description,
+      createdAt: roleData.createdAt,
+      updatedAt: roleData.updatedAt,
     };
   }
 }

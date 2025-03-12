@@ -1,9 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateRoleDto {
   @ApiProperty({
-    description: 'The name of the role',
+    description: 'Nombre del rol',
     example: 'admin',
   })
   @IsString()
@@ -11,9 +17,22 @@ export class CreateRoleDto {
   name: string;
 
   @ApiProperty({
-    description: 'The description of the role',
-    example: 'Administrator role',
+    description: 'Descripción del rol',
+    example: 'Rol de administrador con acceso completo',
+    required: false,
   })
   @IsString()
+  @IsOptional()
   description?: string;
+
+  @ApiProperty({
+    description: 'IDs de los permisos asignados al rol',
+    example: ['123e4567-e89b-12d3-a456-426614174000'],
+    isArray: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsArray()
+  @IsUUID(4, { each: true })
+  permissionIds?: string[];
 }

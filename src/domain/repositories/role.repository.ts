@@ -1,3 +1,4 @@
+import { Permission } from '@prisma/client';
 import { Role } from '../entities/role.entity';
 
 export interface IRoleRepository {
@@ -12,5 +13,6 @@ export interface IRoleRepository {
   addPermission(roleId: string, permissionId: string): Promise<void>;
   removePermission(roleId: string, permissionId: string): Promise<void>;
   getPermissions(roleId: string): Promise<string[]>; // Devuelve IDs de permisos
+  getRolePermissions(roleId: string): Promise<Permission[]>;
   getUserRoles(userId: string): Promise<Role[]>;
 }

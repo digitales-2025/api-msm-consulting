@@ -3,6 +3,7 @@ import { IRoleRepository } from '@/domain/repositories/role.repository';
 import { PrismaRoleMapper } from '@/infrastructure/persistence/prisma/mapper/prisma-role.mapper';
 import { PrismaService } from '@/infrastructure/persistence/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { Permission } from '@prisma/client';
 
 @Injectable()
 export class RoleRepository implements IRoleRepository {
@@ -30,21 +31,21 @@ export class RoleRepository implements IRoleRepository {
   }
 
   async create(role: Role): Promise<Role> {
-    const { id: _id, ...roleData } = role;
+    const prismaData = PrismaRoleMapper.toPrisma(role);
 
     const createdRole = await this.prisma.role.create({
-      data: roleData,
+      data: prismaData,
     });
 
     return PrismaRoleMapper.toDomain(createdRole);
   }
 
   async update(id: string, roleData: Partial<Role>): Promise<Role> {
-    const { id: _id, ...data } = roleData;
+    const { permissions: _permissions, ...updateData } = roleData as any;
 
     const updatedRole = await this.prisma.role.update({
       where: { id },
-      data,
+      data: updateData,
     });
 
     return PrismaRoleMapper.toDomain(updatedRole);
@@ -83,6 +84,14 @@ export class RoleRepository implements IRoleRepository {
     });
 
     return rolePermissions.map((rp) => rp.permissionId);
+  }
+
+  async getRolePermissions(roleId: string): Promise<Permission[]> {
+    const rolePermissions = await this.prisma.rolePermission.findMany({
+      where: { roleId },
+      include: { permission: true },
+    });
+    return rolePermissions.map((rp) => rp.permission);
   }
 
   async getUserRoles(userId: string): Promise<Role[]> {

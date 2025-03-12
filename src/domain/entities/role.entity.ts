@@ -1,3 +1,4 @@
+import { Permission } from '@prisma/client';
 import { IRole } from '../interfaces/role.interface';
 import { Entity } from './entity';
 
@@ -5,6 +6,7 @@ export class Role extends Entity<IRole> {
   id: string;
   name: string;
   description?: string;
+  permissions: Permission[];
   createdAt: Date;
   updatedAt: Date;
 
@@ -15,5 +17,9 @@ export class Role extends Entity<IRole> {
     this.description = props.description ?? undefined;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
+  }
+
+  getPermissions(): Permission[] {
+    return this.permissions;
   }
 }

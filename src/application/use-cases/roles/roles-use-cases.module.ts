@@ -3,7 +3,9 @@ import { Module } from '@nestjs/common';
 import { AssignPermissionToRoleUseCase } from './assign-permission-to-role.use-case';
 import { AssignRoleToUserUseCase } from './assign-role-to-user.use-case';
 import { CreateRoleUseCase } from './create-role.use-case';
+import { GetRolePermissionsUseCase } from './get-rol-permission.use-case';
 import { GetRolesUseCase } from './get-roles.use-case';
+import { UpdateRoleUseCase } from './update-role.use-case';
 
 @Module({
   imports: [PersistenceModule],
@@ -12,12 +14,16 @@ import { GetRolesUseCase } from './get-roles.use-case';
     GetRolesUseCase,
     AssignPermissionToRoleUseCase,
     AssignRoleToUserUseCase,
+    GetRolePermissionsUseCase,
+    UpdateRoleUseCase,
   ],
   exports: [
     CreateRoleUseCase,
     GetRolesUseCase,
     AssignPermissionToRoleUseCase,
     AssignRoleToUserUseCase,
+    GetRolePermissionsUseCase,
+    UpdateRoleUseCase,
   ],
 })
 export class RolesUseCasesModule {}
