@@ -51,7 +51,7 @@ export class AuthController {
   private setTokenCookies(
     response: Response,
     accessToken: string,
-    refreshToken: string,
+    refreshToken: string | null,
   ): void {
     this.logger.debug('Estableciendo cookies de tokens');
     // Configuración de la cookie para el access token
@@ -63,7 +63,8 @@ export class AuthController {
     });
 
     // Solo actualizamos la cookie del refresh token si se proporciona uno nuevo
-    if (refreshToken) {
+    // Si refreshToken es null, no modificamos la cookie existente
+    if (refreshToken !== null && refreshToken !== undefined) {
       // Configuración de la cookie para el refresh token
       response.cookie('refresh_token', refreshToken, {
         httpOnly: true,

@@ -8,7 +8,7 @@ import * as argon2 from 'argon2';
 // Definir un tipo para el resultado de los tokens
 interface TokenResult {
   accessToken: string;
-  refreshToken: string;
+  refreshToken: string | null;
 }
 
 @Injectable()
@@ -85,11 +85,10 @@ export class GenerateTokensUseCase {
             roles,
           );
 
-          // Obtener el valor original del refresh token almacenado en la cookie (no tenemos acceso directo)
-          // Por lo tanto, devolvemos "" para indicar que no se debe actualizar la cookie
+          // No generamos nuevo refresh token, indicamos con null que no debe actualizarse
           return {
             accessToken,
-            refreshToken: '', // No cambiamos el refresh token existente
+            refreshToken: null, // Valor null para indicar que no se debe actualizar
           };
         }
       }
@@ -100,6 +99,12 @@ export class GenerateTokensUseCase {
         email,
         roles,
       );
+
+      // Asegurarse de que refreshToken no sea null antes de hash
+      if (!refreshToken) {
+        throw new Error('Error generando refresh token');
+      }
+
       const hashedRefreshToken = await argon2.hash(refreshToken);
 
       // Get the current user with locking to prevent race conditions
@@ -145,7 +150,7 @@ export class GenerateTokensUseCase {
     userId: string,
     email: string,
     roles: string[],
-  ): Promise<TokenResult> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload = {
       email: email,
       sub: userId,
