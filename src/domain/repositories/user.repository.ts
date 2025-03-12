@@ -7,4 +7,8 @@ export interface IUserRepository {
   findByRefreshToken(token: string): Promise<User | null>;
   create(user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User>;
   update(id: string, userData: Partial<User>): Promise<User>;
+
+  // Métodos para roles
+  addRole(userId: string, roleId: string): Promise<void>;
+  removeRole(userId: string, roleId: string): Promise<void>;
 }
