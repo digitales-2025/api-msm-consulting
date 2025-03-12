@@ -12,14 +12,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-
-// DTOs
-class CreatePermissionDto {
-  name: string;
-  description?: string;
-  resource: string;
-  action: string;
-}
+import { CreatePermissionDto } from './dtos/create-permission.dto';
 
 @ApiTags('Permissions')
 @Controller({
