@@ -7,7 +7,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 
 @Module({
+  providers: [JwtStrategy, RefreshTokenStrategy],
   imports: [
+    ConfigModule,
+    PersistenceModule, // Para acceder al UserRepository
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -19,9 +22,7 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
         },
       }),
     }),
-    PersistenceModule, // Para acceder al UserRepository
   ],
-  providers: [JwtStrategy, RefreshTokenStrategy],
   exports: [PassportModule, JwtModule, JwtStrategy, RefreshTokenStrategy],
 })
 export class AuthModule {}

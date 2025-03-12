@@ -1,7 +1,7 @@
 import { USER_REPOSITORY } from '@/domain/repositories/repositories.providers';
 import { IUserRepository } from '@/domain/repositories/user.repository';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import * as crypto from 'crypto';
+import { verify } from 'argon2';
 
 @Injectable()
 export class ValidateRefreshTokenUseCase {
@@ -10,20 +10,28 @@ export class ValidateRefreshTokenUseCase {
     private userRepository: IUserRepository,
   ) {}
 
-  async execute(refreshToken: string): Promise<any> {
-    // Hash del token para compararlo con el almacenado
-    const hashedToken = this.hashToken(refreshToken);
-    // Buscar usuario con este token
-    const user = await this.userRepository.findByRefreshToken(hashedToken);
+  async execute(userId: string, refreshToken: string): Promise<any> {
+    console.log(
+      '🚀 ~ ValidateRefreshTokenUseCase ~ execute ~ refreshToken:',
+      refreshToken,
+    );
+
+    const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedException('User not found');
     }
 
-    const { password: _password, refreshToken: _, ...result } = user;
-    return result;
-  }
+    if (!user.refreshToken) {
+      throw new UnauthorizedException('No refresh token found for user');
+    }
 
-  private hashToken(token: string): string {
-    return crypto.createHash('sha256').update(token).digest('hex');
+    const refreshTokenMatched = await verify(user.refreshToken, refreshToken);
+
+    // Buscar usuario con este token
+    if (!refreshTokenMatched)
+      throw new UnauthorizedException('Invalid Refresh Token!');
+
+    const currentUser = { id: user.id };
+    return currentUser;
   }
 }

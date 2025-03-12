@@ -3,6 +3,7 @@ import { GenerateTokensUseCase } from '@/application/use-cases/auth/generate-tok
 import { InvalidateTokensUseCase } from '@/application/use-cases/auth/invalidate-token.use-case';
 import { ValidateRefreshTokenUseCase } from '@/application/use-cases/auth/validate-refresh-token.use-case';
 import { Auth } from '@/gateway/decorators/auth.decorator';
+import { RefreshAuth } from '@/gateway/decorators/refresh-auth.decorator';
 import { GetUser } from '@/gateway/decorators/user.decorator';
 import {
   BadRequestException,
@@ -20,11 +21,17 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthResponseDto } from './dtos/auth-response.dto';
-import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 
+interface RequestWithUser extends Request {
+  user: {
+    refreshToken: string;
+    sub: string;
+    [key: string]: any;
+  };
+}
 @ApiTags('Auth')
 @Controller({
   path: 'auth',
@@ -109,7 +116,6 @@ export class AuthController {
       'Devuelve los datos del usuario autenticado y establece cookies para los tokens',
     type: AuthResponseDto,
   })
-  // En el método login
   async login(
     @Body() signInDto: SignInDto,
     @Res({ passthrough: true }) response: Response,
@@ -156,24 +162,19 @@ export class AuthController {
     description: 'Renueva el token de acceso y actualiza las cookies',
     type: AuthResponseDto,
   })
+  @RefreshAuth()
   async refreshToken(
-    @Body() body: RefreshTokenDto,
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
+    @Req() req: RequestWithUser,
+    @Res() response: Response,
   ): Promise<AuthResponseDto> {
     try {
-      // Intentamos usar primero la cookie, luego el cuerpo de la solicitud
-      const refreshToken = request.cookies?.refresh_token || body.refreshToken;
-      if (!refreshToken) {
-        throw new Error('No refresh token provided');
-      }
-
+      const refreshToken = req.user.refreshToken;
+      const userId = req.user.sub;
       // Validar el refresh token
       const user = await this.validateRefreshTokenUseCase.execute(
-        refreshToken as string,
+        userId,
+        refreshToken,
       );
-      console.log('🚀 ~ AuthController ~ user:', user);
-
       // Generar nuevos tokens
       const tokens = await this.generateTokensUseCase.execute(
         user.id as string,
