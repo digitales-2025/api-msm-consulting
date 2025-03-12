@@ -18,6 +18,7 @@ import {
   Post,
   Req,
   Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -52,6 +53,7 @@ export class AuthController {
     accessToken: string,
     refreshToken: string,
   ): void {
+    this.logger.debug('Estableciendo cookies de tokens');
     // Configuración de la cookie para el access token
     response.cookie('access_token', accessToken, {
       httpOnly: true,
@@ -60,13 +62,16 @@ export class AuthController {
       maxAge: this.getAccessTokenMaxAge(), // Duración del JWT
     });
 
-    // Configuración de la cookie para el refresh token
-    response.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development', // HTTPS en producción
-      sameSite: 'strict',
-      maxAge: this.getRefreshTokenMaxAge(), // Duración más larga
-    });
+    // Solo actualizamos la cookie del refresh token si se proporciona uno nuevo
+    if (refreshToken) {
+      // Configuración de la cookie para el refresh token
+      response.cookie('refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development', // HTTPS en producción
+        sameSite: 'strict',
+        maxAge: this.getRefreshTokenMaxAge(), // Duración más larga
+      });
+    }
   }
 
   private clearTokenCookies(response: Response): void {
@@ -129,11 +134,14 @@ export class AuthController {
         throw new BadRequestException('Credenciales inválidas');
       }
 
+      // En login siempre generamos ambos tokens (access y refresh)
       const tokens = await this.generateTokensUseCase.execute(
         user.id as string,
         user.email as string,
         user.roles as string[],
+        { generateRefresh: true },
       );
+
       // Establecer cookies con los tokens
       this.setTokenCookies(response, tokens.accessToken, tokens.refreshToken);
 
@@ -165,26 +173,30 @@ export class AuthController {
   @RefreshAuth()
   async refreshToken(
     @Req() req: RequestWithUser,
-    @Res() response: Response,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponseDto> {
     try {
       const refreshToken = req.user.refreshToken;
       const userId = req.user.sub;
+
       // Validar el refresh token
       const user = await this.validateRefreshTokenUseCase.execute(
         userId,
         refreshToken,
       );
-      // Generar nuevos tokens
+
+      // Generar solo un nuevo access token, manteniendo el mismo refresh token
       const tokens = await this.generateTokensUseCase.execute(
         user.id as string,
         user.email as string,
         user.roles as string[],
+        { generateRefresh: false },
       );
-      // Establecer nuevas cookies con los tokens actualizados
+
+      // Establecer cookies actualizadas
+      // Si refreshToken está vacío, solo se actualizará el access token
       this.setTokenCookies(response, tokens.accessToken, tokens.refreshToken);
 
-      // Devolver solo información del usuario
       return {
         id: user.id,
         email: user.email,
@@ -193,11 +205,8 @@ export class AuthController {
         statusCode: HttpStatus.OK,
       };
     } catch (error) {
-      this.logger.error(error.message);
-      return {
-        message: 'Token inválido o expirado',
-        statusCode: HttpStatus.UNAUTHORIZED,
-      };
+      this.logger.error(`Error en refresh token: ${error.message}`);
+      throw new UnauthorizedException('Token inválido o expirado');
     }
   }
 

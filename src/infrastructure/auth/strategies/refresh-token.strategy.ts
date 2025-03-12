@@ -30,7 +30,6 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
   async validate(req: Request, payload: { sub: string }) {
     const refreshToken = req.cookies?.refresh_token; // Extraer el refresh token de la cookie
-    console.log('🚀 ~ validate ~ refreshToken:', refreshToken);
     // 1. Verificación: El refresh token existe
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token is missing');
