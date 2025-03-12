@@ -14,20 +14,9 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-
-// DTOs
-class CreateRoleDto {
-  name: string;
-  description?: string;
-}
-
-class AssignPermissionDto {
-  permissionId: string;
-}
-
-class AssignRoleToUserDto {
-  userId: string;
-}
+import { AssignPermissionDto } from './dtos/assign-permission.dto';
+import { AssignRoleToUserDto } from './dtos/assign-role-to-user.dto';
+import { CreateRoleDto } from './dtos/create-role.dto';
 
 @ApiTags('Roles')
 @Controller({
