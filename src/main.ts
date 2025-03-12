@@ -40,9 +40,14 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  document.tags = [];
+  document.tags = [
+    { name: 'Auth', description: 'Endpoints related to authentication' },
+  ];
 
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    jsonDocumentUrl: 'api-json',
+    customSiteTitle: 'Ms&M Consulting API',
+  });
 
   await app.listen(parseInt(process.env.PORT ?? '3000'));
 }
