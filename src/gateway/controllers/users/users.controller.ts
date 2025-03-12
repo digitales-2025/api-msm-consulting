@@ -15,8 +15,8 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetUserPermissionsUseCase } from 'src/application/use-cases/users/get-user-permissions.use-case';
 import { Permission } from 'src/domain/entities/permission.entity';
+import { PermissionResponseDto } from '../permissions/dtos/permission-response.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { PermissionResponseDto } from './dtos/permission-response.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserResponseDto } from './dtos/user-response.dto';
 import { UserResponseMapper } from './mappers/user-response.mapper';
@@ -130,6 +130,8 @@ export class UsersController {
       description: permission.description,
       resource: permission.resource,
       action: permission.action,
+      createdAt: permission.createdAt,
+      updatedAt: permission.updatedAt,
     }));
   }
 }

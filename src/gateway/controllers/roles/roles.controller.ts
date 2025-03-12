@@ -17,6 +17,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AssignPermissionDto } from './dtos/assign-permission.dto';
 import { AssignRoleToUserDto } from './dtos/assign-role-to-user.dto';
 import { CreateRoleDto } from './dtos/create-role.dto';
+import { RoleResponseDto } from './dtos/role-response.dto';
 
 @ApiTags('Roles')
 @Controller({
@@ -39,13 +40,18 @@ export class RolesController {
   @ApiResponse({
     status: 201,
     description: 'Rol creado exitosamente',
+    type: RoleResponseDto,
   })
-  async createRole(@Body() createRoleDto: CreateRoleDto) {
+  async createRole(
+    @Body() createRoleDto: CreateRoleDto,
+  ): Promise<RoleResponseDto> {
     const role = await this.createRoleUseCase.execute(createRoleDto);
     return {
       id: role.id,
       name: role.name,
       description: role.description,
+      createdAt: role.createdAt,
+      updatedAt: role.updatedAt,
     };
   }
 
@@ -56,13 +62,16 @@ export class RolesController {
   @ApiResponse({
     status: 200,
     description: 'Lista de roles',
+    type: [RoleResponseDto],
   })
-  async getRoles() {
+  async getRoles(): Promise<RoleResponseDto[]> {
     const roles = await this.getRolesUseCase.execute();
     return roles.map((role) => ({
       id: role.id,
       name: role.name,
       description: role.description,
+      createdAt: role.createdAt,
+      updatedAt: role.updatedAt,
     }));
   }
 
