@@ -22,6 +22,13 @@ export class RoleResponseDto {
   description?: string;
 
   @ApiProperty({
+    description: 'IDs de permisos asignados al rol',
+    example: ['5f9d5e7b8e7a6c1d4c8e7a6c', '5f9d5e7b8e7a6c1d4c8e7a6d'],
+    isArray: true,
+  })
+  permissionIds?: string[];
+
+  @ApiProperty({
     description: 'Fecha de creación del rol',
     example: '2023-01-15T14:30:00Z',
   })

@@ -77,6 +77,7 @@ export class RolesController {
       id: role.id,
       name: role.name,
       description: role.description,
+      permissionIds: role['permissionIds'] || [],
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
     }));
