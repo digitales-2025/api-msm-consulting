@@ -3,9 +3,10 @@ export interface IUser {
   email: string;
   password: string;
   fullName: string;
-  roles: string[];
-  refreshToken: string | null;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  roles?: string[];
+  activities?: string[];
+  refreshToken?: string | null;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

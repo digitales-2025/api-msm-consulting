@@ -11,6 +11,7 @@ export class User extends Entity<IUser> {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  activities: string[];
 
   constructor(props: IUser) {
     super(props);
@@ -18,10 +19,11 @@ export class User extends Entity<IUser> {
     this.email = props.email;
     this.password = props.password;
     this.fullName = props.fullName;
-    this.roles = props.roles;
-    this.refreshToken = props.refreshToken;
-    this.isActive = props.isActive;
-    this.createdAt = props.createdAt;
-    this.updatedAt = props.updatedAt;
+    this.roles = props.roles || [];
+    this.refreshToken = props.refreshToken || null;
+    this.isActive = props.isActive ?? true;
+    this.createdAt = props.createdAt ?? new Date();
+    this.updatedAt = props.updatedAt ?? new Date();
+    this.activities = props.activities || [];
   }
 }

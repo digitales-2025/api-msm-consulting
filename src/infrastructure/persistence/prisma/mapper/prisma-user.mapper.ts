@@ -13,19 +13,31 @@ export class PrismaUserMapper {
       isActive: entity.isActive,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      activities: [],
     });
     return model;
   }
 
   static toPrisma(user: User): Prisma.UserUncheckedCreateInput {
-    return {
-      fullName: user.fullName,
-      email: user.email,
-      password: user.password,
-      refreshToken: user.refreshToken,
-      isActive: user.isActive,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+    const { activities, ...userData } = user;
+
+    const result: Prisma.UserUncheckedCreateInput = {
+      fullName: userData.fullName,
+      email: userData.email,
+      password: userData.password,
+      refreshToken: userData.refreshToken,
+      isActive: userData.isActive,
+      createdAt: userData.createdAt,
+      updatedAt: userData.updatedAt,
     };
+
+    // Solo agregar activities si existe y tiene elementos
+    if (activities && activities.length > 0) {
+      result.activities = {
+        connect: activities.map((activity) => ({ id: activity })),
+      };
+    }
+
+    return result;
   }
 }
