@@ -7,6 +7,7 @@ export class Role extends Entity<IRole> {
   name: string;
   description?: string;
   permissions: Permission[];
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 
@@ -15,8 +16,9 @@ export class Role extends Entity<IRole> {
     this.id = props.id;
     this.name = props.name;
     this.description = props.description ?? undefined;
-    this.createdAt = props.createdAt;
-    this.updatedAt = props.updatedAt;
+    this.isActive = props.isActive ?? true;
+    this.createdAt = props.createdAt ?? new Date();
+    this.updatedAt = props.updatedAt ?? new Date();
   }
 
   getPermissions(): Permission[] {

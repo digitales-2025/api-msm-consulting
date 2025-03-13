@@ -1,6 +1,7 @@
 import { AssignPermissionToRoleUseCase } from '@/application/use-cases/roles/assign-permission-to-role.use-case';
 import { AssignRoleToUserUseCase } from '@/application/use-cases/roles/assign-role-to-user.use-case';
 import { CreateRoleUseCase } from '@/application/use-cases/roles/create-role.use-case';
+import { DeleteRoleUseCase } from '@/application/use-cases/roles/delete-rol.use-case';
 import { GetRolePermissionsUseCase } from '@/application/use-cases/roles/get-rol-permission.use-case';
 import { GetRolesUseCase } from '@/application/use-cases/roles/get-roles.use-case';
 import { UpdateRoleUseCase } from '@/application/use-cases/roles/update-role.use-case';
@@ -9,6 +10,7 @@ import { RequirePermission } from '@/gateway/decorators/require-permission.decor
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -38,6 +40,7 @@ export class RolesController {
     private readonly assignRoleToUserUseCase: AssignRoleToUserUseCase,
     private readonly getRolePermissionsUseCase: GetRolePermissionsUseCase,
     private readonly updateRoleUseCase: UpdateRoleUseCase,
+    private readonly deleteRoleUseCase: DeleteRoleUseCase,
   ) {}
 
   @Post()
@@ -57,6 +60,7 @@ export class RolesController {
       id: role.id,
       name: role.name,
       description: role.description,
+      isActive: role.isActive,
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
     };
@@ -78,6 +82,7 @@ export class RolesController {
       name: role.name,
       description: role.description,
       permissionIds: role['permissionIds'] || [],
+      isActive: role.isActive,
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
     }));
@@ -173,8 +178,31 @@ export class RolesController {
       id: role.id,
       name: role.name,
       description: role.description,
+      isActive: role.isActive,
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
     };
+  }
+
+  @Delete(':id')
+  @Auth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Eliminar un rol (desactivación lógica)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Rol eliminado exitosamente',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Rol no encontrado',
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      'No se puede eliminar el rol (ya está inactivo o está asignado a usuarios)',
+  })
+  async deleteRole(@Param('id') id: string): Promise<{ message: string }> {
+    await this.deleteRoleUseCase.execute({ roleId: id });
+    return { message: 'Rol eliminado exitosamente' };
   }
 }

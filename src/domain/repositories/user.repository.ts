@@ -5,6 +5,7 @@ export interface IUserRepository {
   findById(id: string): Promise<User | null>;
   findAll(): Promise<User[]>;
   findByRefreshToken(token: string): Promise<User | null>;
+  findByRoleId(roleId: string): Promise<User[]>;
   create(user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User>;
   update(id: string, userData: Partial<User>): Promise<User>;
 

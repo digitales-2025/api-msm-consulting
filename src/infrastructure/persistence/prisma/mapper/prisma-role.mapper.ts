@@ -7,6 +7,7 @@ export class PrismaRoleMapper {
       id: entity.id,
       name: entity.name,
       description: entity.description,
+      isActive: entity.isActive !== undefined ? entity.isActive : true,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });
@@ -20,6 +21,7 @@ export class PrismaRoleMapper {
       id: roleData.id || undefined,
       name: roleData.name,
       description: roleData.description,
+      isActive: roleData.isActive !== undefined ? roleData.isActive : true,
       createdAt: roleData.createdAt,
       updatedAt: roleData.updatedAt,
     };

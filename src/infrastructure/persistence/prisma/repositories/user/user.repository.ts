@@ -120,4 +120,13 @@ export class UserRepository implements IUserRepository {
       },
     });
   }
+
+  async findByRoleId(roleId: string): Promise<User[]> {
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { roleId },
+      include: { user: true },
+    });
+
+    return userRoles.map((ur) => PrismaUserMapper.toDomain(ur.user));
+  }
 }

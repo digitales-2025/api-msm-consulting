@@ -24,9 +24,16 @@ export class RoleResponseDto {
   @ApiProperty({
     description: 'IDs de permisos asignados al rol',
     example: ['5f9d5e7b8e7a6c1d4c8e7a6c', '5f9d5e7b8e7a6c1d4c8e7a6d'],
-    isArray: true,
+    type: [String],
+    required: false,
   })
   permissionIds?: string[];
+
+  @ApiProperty({
+    description: 'Estado del rol (activo/inactivo)',
+    example: true,
+  })
+  isActive: boolean;
 
   @ApiProperty({
     description: 'Fecha de creación del rol',

@@ -41,8 +41,6 @@ export class CreateRoleUseCase {
       id: '', // Será generado por la base de datos
       name: data.name,
       description: data.description,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     });
 
     // Guardar el rol en la base de datos

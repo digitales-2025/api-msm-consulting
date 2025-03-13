@@ -2,6 +2,7 @@ export interface IRole {
   id: string;
   name: string;
   description?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
