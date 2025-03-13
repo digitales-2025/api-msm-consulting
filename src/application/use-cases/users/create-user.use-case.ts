@@ -52,6 +52,7 @@ export class CreateUserUseCase {
       roles: [], // Inicialmente sin roles
       isActive: userData.isActive !== undefined ? userData.isActive : true,
       refreshToken: null,
+      activities: [],
     };
 
     // Persistir el usuario
