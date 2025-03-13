@@ -11,23 +11,65 @@ export class UserRepository implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
     });
 
-    return user ? PrismaUserMapper.toDomain(user) : null;
+    if (!user) return null;
+
+    // Convertir a objeto de dominio y cargar los roles
+    const domainUser = PrismaUserMapper.toDomain(user);
+
+    // Asignar los nombres de roles desde la relación
+    domainUser.roles = user.roles.map((ur) => ur.role.name);
+
+    return domainUser;
   }
 
   async findById(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
     });
 
-    return user ? PrismaUserMapper.toDomain(user) : null;
+    if (!user) return null;
+
+    // Convertir a objeto de dominio y cargar los roles
+    const domainUser = PrismaUserMapper.toDomain(user);
+
+    // Asignar los nombres de roles desde la relación
+    domainUser.roles = user.roles.map((ur) => ur.role.name);
+
+    return domainUser;
   }
 
   async findAll(): Promise<User[]> {
-    const users = await this.prisma.user.findMany();
+    const users = await this.prisma.user.findMany({
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
 
-    return users.map((user) => PrismaUserMapper.toDomain(user));
+    return users.map((user) => {
+      const domainUser = PrismaUserMapper.toDomain(user);
+      domainUser.roles = user.roles.map((ur) => ur.role.name);
+      return domainUser;
+    });
   }
 
   async findByRefreshToken(hashedToken: string): Promise<User | null> {
@@ -57,5 +99,34 @@ export class UserRepository implements IUserRepository {
     });
 
     return PrismaUserMapper.toDomain(userUpdate);
+  }
+
+  async addRole(userId: string, roleId: string): Promise<void> {
+    await this.prisma.userRole.create({
+      data: {
+        userId,
+        roleId,
+      },
+    });
+  }
+
+  async removeRole(userId: string, roleId: string): Promise<void> {
+    await this.prisma.userRole.delete({
+      where: {
+        userId_roleId: {
+          userId,
+          roleId,
+        },
+      },
+    });
+  }
+
+  async findByRoleId(roleId: string): Promise<User[]> {
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { roleId },
+      include: { user: true },
+    });
+
+    return userRoles.map((ur) => PrismaUserMapper.toDomain(ur.user));
   }
 }

@@ -3,7 +3,9 @@ import {
   IsArray,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
+  IsUUID,
   MinLength,
 } from 'class-validator';
 
@@ -35,11 +37,13 @@ export class CreateUserDto {
   fullName: string;
 
   @ApiProperty({
-    description: 'Roles del usuario',
-    example: ['user'],
+    description: 'IDs de roles a asignar al usuario',
+    example: ['123e4567-e89b-12d3-a456-426614174000'],
     isArray: true,
-    default: ['user'],
+    required: false,
   })
+  @IsOptional()
   @IsArray()
-  roles: string[] = ['user'];
+  @IsUUID(4, { each: true })
+  roleIds?: string[];
 }

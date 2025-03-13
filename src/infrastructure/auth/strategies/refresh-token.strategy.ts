@@ -1,5 +1,6 @@
-import { UserRepository } from '@/infrastructure/persistence/prisma/repositories/user/user.repository';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { USER_REPOSITORY } from '@/domain/repositories/repositories.providers';
+import { IUserRepository } from '@/domain/repositories/user.repository';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
@@ -11,7 +12,8 @@ export class RefreshTokenStrategy extends PassportStrategy(
   'jwt-refresh',
 ) {
   constructor(
-    private readonly userRepository: UserRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
     configService: ConfigService,
   ) {
     super({
