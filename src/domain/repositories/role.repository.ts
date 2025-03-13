@@ -1,4 +1,4 @@
-import { Permission } from '@prisma/client';
+import { Permission } from '../entities/permission.entity';
 import { Role } from '../entities/role.entity';
 
 export interface IRoleRepository {
