@@ -16,7 +16,7 @@ export class PermissionRepository implements IPermissionRepository {
   }
 
   async findById(id: string): Promise<Permission | null> {
-    const permission = await this.prisma.permission.findUnique({
+    const permission = await this.prisma.permission.findFirst({
       where: { id },
     });
 
@@ -24,7 +24,7 @@ export class PermissionRepository implements IPermissionRepository {
   }
 
   async findByName(name: string): Promise<Permission | null> {
-    const permission = await this.prisma.permission.findUnique({
+    const permission = await this.prisma.permission.findFirst({
       where: { name },
     });
 
