@@ -14,5 +14,6 @@ export interface IObjectiveRepository {
   addActivity(objectiveId: string, activityId: string): Promise<void>;
   removeActivity(objectiveId: string, activityId: string): Promise<void>;
   getActivities(objectiveId: string): Promise<Activity[]>;
+  getObjectivesByServiceId(serviceId: string): Promise<Objective[]>;
   getService(objectiveId: string): Promise<Service | null>;
 }
