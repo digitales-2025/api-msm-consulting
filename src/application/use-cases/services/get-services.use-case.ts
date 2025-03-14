@@ -1,4 +1,4 @@
-import { ROLE_REPOSITORY } from '@/domain/repositories/repositories.providers';
+import { SERVICE_REPOSITORY } from '@/domain/repositories/repositories.providers';
 import { IServiceRepository } from '@/domain/repositories/service.repository';
 import { ServiceResponseDto } from '@/gateway/controllers/services/dtos/service-response.dto';
 import { Inject, Injectable } from '@nestjs/common';
@@ -6,7 +6,7 @@ import { Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class GetServicesUseCase {
   constructor(
-    @Inject(ROLE_REPOSITORY)
+    @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
   ) {}
 
