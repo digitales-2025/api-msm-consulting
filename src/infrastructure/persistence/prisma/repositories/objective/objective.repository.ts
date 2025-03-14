@@ -82,7 +82,16 @@ export class ObjectiveRepository implements IObjectiveRepository {
   async getObjectivesByServiceId(serviceId: string): Promise<Objective[]> {
     const objectives = await this.prisma.objective.findMany({
       where: { serviceId },
+      include: { activities: true },
     });
-    return objectives.map((objective) => new Objective(objective));
+    return objectives.map(
+      (objective) =>
+        new Objective({
+          id: objective.id,
+          name: objective.name,
+          description: objective.description,
+          activities: objective.activities.map((activity) => activity.id),
+        }),
+    );
   }
 }
