@@ -11,7 +11,11 @@ export class ActivityRepository implements IActivityRepository {
   constructor(private prisma: PrismaService) {}
 
   async findAll(): Promise<Activity[]> {
-    const activities = await this.prisma.activity.findMany();
+    const activities = await this.prisma.activity.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
     return activities.map((activity) => new Activity(activity));
   }
 

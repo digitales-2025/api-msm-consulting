@@ -15,6 +15,9 @@ export class ServiceRepository implements IServiceRepository {
       include: {
         objectives: true,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
     return services.map(
       (service) =>

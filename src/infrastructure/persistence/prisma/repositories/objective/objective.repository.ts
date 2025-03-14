@@ -11,7 +11,11 @@ export class ObjectiveRepository implements IObjectiveRepository {
   constructor(private prisma: PrismaService) {}
 
   async findAll(): Promise<Objective[]> {
-    const objectives = await this.prisma.objective.findMany();
+    const objectives = await this.prisma.objective.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
     return objectives.map((objective) => new Objective(objective));
   }
 
