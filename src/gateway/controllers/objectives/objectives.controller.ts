@@ -74,7 +74,7 @@ export class ObjectivesController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Actualizar una objetivo existente' })
+  @ApiOperation({ summary: 'Actualizar un objetivo existente' })
   @ApiResponse({
     status: 200,
     description: 'Objetivo actualizado con éxito',

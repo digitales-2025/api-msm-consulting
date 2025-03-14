@@ -9,10 +9,10 @@ export class Activity extends Entity<IActivity> {
   isGlobal: boolean;
   isEvidence: boolean;
   fileUrl: string | null;
-  responsibleUserId: string | null;
-  frequency: string | null;
-  scheduleDate: string | null;
-  executionDate: string | null;
+  responsibleUserId?: string | null;
+  frequency?: string | null;
+  scheduleDate?: string | null;
+  executionDate?: string | null;
   createdAt: Date;
   updatedAt: Date;
   objectiveId: string;

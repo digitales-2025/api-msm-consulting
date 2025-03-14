@@ -54,8 +54,9 @@ export class ActivityRepository implements IActivityRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.activity.delete({
+    await this.prisma.activity.update({
       where: { id },
+      data: { isActive: false },
     });
   }
 

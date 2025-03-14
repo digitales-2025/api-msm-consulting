@@ -40,22 +40,24 @@ export class PrismaActivityMapper {
   static toUpdateInput(
     activity: Partial<Activity>,
   ): Prisma.ActivityUpdateInput {
-    return {
-      name: activity.name,
-      description: activity.description,
-      responsibleUser: {
-        connect: {
-          id: activity.responsibleUserId ?? '',
-        },
-      },
-      frequency: activity.frequency as Frequency,
-      scheduleDate: activity.scheduleDate,
-      executionDate: activity.executionDate,
-      objective: {
-        connect: {
-          id: activity.objectiveId,
-        },
-      },
-    };
+    const data: Prisma.ActivityUpdateInput = {};
+
+    if (activity.name !== undefined) data.name = activity.name;
+    if (activity.description !== undefined)
+      data.description = activity.description;
+    if (activity.responsibleUserId !== undefined)
+      data.responsibleUser = {
+        connect: { id: activity.responsibleUserId ?? '' },
+      };
+    if (activity.frequency !== undefined)
+      data.frequency = activity.frequency as Frequency;
+    if (activity.scheduleDate !== undefined)
+      data.scheduleDate = activity.scheduleDate;
+    if (activity.executionDate !== undefined)
+      data.executionDate = activity.executionDate;
+    if (activity.objectiveId !== undefined)
+      data.objective = { connect: { id: activity.objectiveId } };
+
+    return data;
   }
 }
