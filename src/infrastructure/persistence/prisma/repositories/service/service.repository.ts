@@ -10,8 +10,24 @@ export class ServiceRepository implements IServiceRepository {
   constructor(private prisma: PrismaService) {}
 
   async findAll(): Promise<Service[]> {
-    const services = await this.prisma.service.findMany();
-    return services.map((service) => new Service(service));
+    const services = await this.prisma.service.findMany({
+      include: {
+        objectives: true,
+      },
+    });
+    return services.map(
+      (service) =>
+        new Service({
+          id: service.id,
+          name: service.name,
+          description: service.description,
+          objectives: service.objectives.map((objective) => objective.id),
+          isActive: service.isActive,
+          isGlobal: service.isGlobal,
+          createdAt: service.createdAt,
+          updatedAt: service.updatedAt,
+        }),
+    );
   }
 
   async findById(id: string): Promise<Service | null> {

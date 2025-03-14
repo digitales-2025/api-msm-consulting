@@ -8,4 +8,4 @@ import { GetServicesUseCase } from './get-services.use-case';
   providers: [CreateServiceUseCase, GetServicesUseCase],
   exports: [CreateServiceUseCase, GetServicesUseCase],
 })
-export class ServicesUserCasesModule {}
+export class ServicesUseCasesModule {}

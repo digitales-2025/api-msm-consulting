@@ -1,9 +1,9 @@
-import { ServicesUserCasesModule } from '@/application/use-cases/services/services-user-cases.module';
+import { ServicesUseCasesModule } from '@/application/use-cases/services/services-use-cases.module';
 import { Module } from '@nestjs/common';
 import { ServicesController } from './services.controller';
 
 @Module({
-  imports: [ServicesUserCasesModule],
+  imports: [ServicesUseCasesModule],
   controllers: [ServicesController],
 })
 export class ServicesModule {}

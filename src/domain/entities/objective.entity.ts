@@ -21,7 +21,7 @@ export class Objective extends Entity<IObjective> {
     this.isGlobal = props.isGlobal ?? true;
     this.createdAt = props.createdAt ?? new Date();
     this.updatedAt = props.updatedAt ?? new Date();
-    this.serviceId = props.serviceId;
+    this.serviceId = props.serviceId ?? '';
     this.activities = props.activities ?? [];
   }
 }

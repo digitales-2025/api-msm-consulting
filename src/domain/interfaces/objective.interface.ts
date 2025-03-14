@@ -6,7 +6,6 @@ export interface IObjective {
   isGlobal?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  serviceId: string;
-  service?: string;
-  activities: string[];
+  serviceId?: string;
+  activities?: string[];
 }
