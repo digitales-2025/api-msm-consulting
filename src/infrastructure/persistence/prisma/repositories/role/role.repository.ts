@@ -1,9 +1,9 @@
+import { Permission } from '@/domain/entities/permission.entity';
 import { Role } from '@/domain/entities/role.entity';
 import { IRoleRepository } from '@/domain/repositories/role.repository';
 import { PrismaRoleMapper } from '@/infrastructure/persistence/prisma/mapper/prisma-role.mapper';
 import { PrismaService } from '@/infrastructure/persistence/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Permission } from '@prisma/client';
 
 @Injectable()
 export class RoleRepository implements IRoleRepository {
@@ -95,7 +95,17 @@ export class RoleRepository implements IRoleRepository {
       where: { roleId },
       include: { permission: true },
     });
-    return rolePermissions.map((rp) => rp.permission);
+    return rolePermissions.map((rp) => {
+      return new Permission({
+        id: rp.permission.id,
+        name: rp.permission.name,
+        description: rp.permission.description,
+        resource: rp.permission.resource,
+        action: rp.permission.action,
+        createdAt: rp.permission.createdAt,
+        updatedAt: rp.permission.updatedAt,
+      });
+    });
   }
 
   async getUserRoles(userId: string): Promise<Role[]> {
