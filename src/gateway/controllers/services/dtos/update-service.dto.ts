@@ -1,21 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
-export class CreateServiceDto {
+export class UpdateServiceDto {
   @ApiProperty({
     description: 'El nombre del servicio',
-    example: 'Servicio de ejemplo',
-    type: String,
+    example: 'Servicio 1',
   })
   @IsString()
-  @IsNotEmpty()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @ApiProperty({
     description: 'La descripción del servicio',
-    example: 'Descripción del servicio de ejemplo',
-    type: String,
-    required: false,
+    example: 'Descripción del servicio',
   })
   @IsString()
   @IsOptional()
@@ -24,9 +21,8 @@ export class CreateServiceDto {
   @ApiProperty({
     description: 'Los objetivos del servicio',
     example: ['Objetivo 1', 'Objetivo 2'],
-    required: false,
   })
-  @IsOptional()
   @IsArray()
+  @IsOptional()
   objectives?: string[];
 }
