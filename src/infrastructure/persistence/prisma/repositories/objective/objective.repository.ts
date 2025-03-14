@@ -40,7 +40,10 @@ export class ObjectiveRepository implements IObjectiveRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.objective.delete({ where: { id } });
+    await this.prisma.objective.update({
+      where: { id },
+      data: { isActive: false },
+    });
   }
 
   async findByServiceId(serviceId: string): Promise<Objective[]> {

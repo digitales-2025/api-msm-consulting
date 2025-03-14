@@ -11,6 +11,7 @@ export class ServiceRepository implements IServiceRepository {
 
   async findAll(): Promise<Service[]> {
     const services = await this.prisma.service.findMany({
+      where: { isActive: true },
       include: {
         objectives: true,
       },
@@ -57,8 +58,9 @@ export class ServiceRepository implements IServiceRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.service.delete({
+    await this.prisma.service.update({
       where: { id },
+      data: { isActive: false },
     });
   }
 
