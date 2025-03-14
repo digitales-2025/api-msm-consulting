@@ -8,11 +8,11 @@ export interface IActivity {
   isGlobal?: boolean;
   isEvidence?: boolean;
   fileUrl?: string | null;
-  responsibleUserId: string;
-  responsibleUser?: IUser;
-  frequency: string;
-  scheduleDate: Date;
-  executionDate: Date;
+  responsibleUserId?: string | null;
+  responsibleUser?: IUser | null;
+  frequency?: string | null;
+  scheduleDate?: string | null;
+  executionDate?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
   objectiveId: string;

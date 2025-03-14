@@ -1,4 +1,5 @@
 import {
+  ACTIVITY_REPOSITORY,
   OBJECTIVE_REPOSITORY,
   PERMISSION_REPOSITORY,
   ROLE_REPOSITORY,
@@ -6,6 +7,7 @@ import {
   USER_REPOSITORY,
 } from '@/domain/repositories/repositories.providers';
 import { Provider } from '@nestjs/common';
+import { ActivityRepository } from './activity/activity.repository';
 import { ObjectiveRepository } from './objective/objective.repository';
 import { PermissionRepository } from './permission/permission.repository';
 import { RoleRepository } from './role/role.repository';
@@ -31,5 +33,9 @@ export const REPOSITORIES_PROVIDERS: Provider[] = [
   {
     provide: OBJECTIVE_REPOSITORY,
     useClass: ObjectiveRepository,
+  },
+  {
+    provide: ACTIVITY_REPOSITORY,
+    useClass: ActivityRepository,
   },
 ];

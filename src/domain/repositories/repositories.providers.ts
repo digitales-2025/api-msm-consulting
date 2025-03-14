@@ -1,3 +1,4 @@
+import { ActivityRepository } from '@/infrastructure/persistence/prisma/repositories/activity/activity.repository';
 import { ObjectiveRepository } from '@/infrastructure/persistence/prisma/repositories/objective/objective.repository';
 import { PermissionRepository } from '@/infrastructure/persistence/prisma/repositories/permission/permission.repository';
 import { RoleRepository } from '@/infrastructure/persistence/prisma/repositories/role/role.repository';
@@ -10,6 +11,7 @@ export const ROLE_REPOSITORY = Symbol('ROLE_REPOSITORY');
 export const PERMISSION_REPOSITORY = Symbol('PERMISSION_REPOSITORY');
 export const SERVICE_REPOSITORY = Symbol('SERVICE_REPOSITORY');
 export const OBJECTIVE_REPOSITORY = Symbol('OBJECTIVE_REPOSITORY');
+export const ACTIVITY_REPOSITORY = Symbol('ACTIVITY_REPOSITORY');
 
 export const REPOSITORIES_PROVIDERS: Provider[] = [
   {
@@ -31,5 +33,9 @@ export const REPOSITORIES_PROVIDERS: Provider[] = [
   {
     provide: OBJECTIVE_REPOSITORY,
     useClass: ObjectiveRepository,
+  },
+  {
+    provide: ACTIVITY_REPOSITORY,
+    useClass: ActivityRepository,
   },
 ];

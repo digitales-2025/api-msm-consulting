@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Activity" ALTER COLUMN "responsibleUserId" DROP NOT NULL,
+ALTER COLUMN "frequency" DROP NOT NULL,
+ALTER COLUMN "scheduleDate" DROP NOT NULL,
+ALTER COLUMN "scheduleDate" SET DATA TYPE TEXT,
+ALTER COLUMN "executionDate" DROP NOT NULL,
+ALTER COLUMN "executionDate" SET DATA TYPE TEXT;

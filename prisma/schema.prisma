@@ -105,23 +105,23 @@ model Objective {
 }
 
 model Activity {
-  id                String    @id @default(uuid())
+  id                String     @id @default(uuid())
   name              String
   description       String?
-  isActive          Boolean   @default(true)
-  isGlobal          Boolean   @default(true)
-  isEvidence        Boolean   @default(false)
+  isActive          Boolean    @default(true)
+  isGlobal          Boolean    @default(true)
+  isEvidence        Boolean    @default(false)
   fileUrl           String?
-  responsibleUserId String
-  responsibleUser   User      @relation(fields: [responsibleUserId], references: [id], onDelete: Cascade)
-  frequency         Frequency
-  scheduleDate      DateTime  @db.Timestamptz(6)
-  executionDate     DateTime  @db.Timestamptz(6)
-  createdAt         DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime  @updatedAt
+  responsibleUserId String?
+  responsibleUser   User?      @relation(fields: [responsibleUserId], references: [id], onDelete: Cascade)
+  frequency         Frequency?
+  scheduleDate      String?
+  executionDate     String?
+  createdAt         DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime   @updatedAt
   // Relaciones
   objectiveId       String
-  objective         Objective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  objective         Objective  @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
 }
 
 enum Frequency {

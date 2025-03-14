@@ -14,4 +14,8 @@ export interface IActivityRepository {
   // Métodos para manejar asociaciones
   getObjective(activityId: string): Promise<Objective | null>;
   getResponsibleUser(activityId: string): Promise<User | null>;
+  getActivitiesByObjectiveId(objectiveId: string): Promise<Activity[]>;
+  getActivitiesByResponsibleUserId(
+    responsibleUserId: string,
+  ): Promise<Activity[]>;
 }
