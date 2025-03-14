@@ -1,8 +1,8 @@
 import { CreateActivityUseCase } from '@/application/use-cases/activities/create-activity.use-case';
 import { GetActivitiesByObjectiveIdUseCase } from '@/application/use-cases/activities/get-activities-by-objetive-id.use-case';
 import { Auth } from '@/gateway/decorators/auth.decorator';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ActivityResponseDto } from './dtos/activity-response.dto';
 import { CreateActivityDto } from './dtos/create-activity.dto';
 
@@ -42,15 +42,21 @@ export class ActivitiesController {
     };
   }
 
-  @Get(':objectiveId')
+  @Get()
   @ApiOperation({ summary: 'Obtener actividades por objetivo' })
   @ApiResponse({
     status: 200,
     description: 'Las actividades han sido obtenidas correctamente',
-    type: ActivityResponseDto,
+    type: [ActivityResponseDto],
+  })
+  @ApiQuery({
+    name: 'objectiveId',
+    description: 'ID del objetivo para filtrar actividades',
+    required: true,
+    type: String,
   })
   async getActivitiesByObjectiveId(
-    @Param('objectiveId') objectiveId: string,
+    @Query('objectiveId') objectiveId: string,
   ): Promise<ActivityResponseDto[]> {
     const activities =
       await this.getActivitiesByObjectiveIdUseCase.execute(objectiveId);
