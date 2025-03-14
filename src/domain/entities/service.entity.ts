@@ -4,16 +4,16 @@ import { Entity } from './entity';
 export class Service extends Entity<IService> {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   isActive: boolean;
   isGlobal: boolean;
   createdAt: Date;
   updatedAt: Date;
-  objectives: string[];
+  objectives?: string[];
 
   constructor(props: IService) {
     super(props);
-    this.id = props.id;
+    this.id = props.id ?? '';
     this.name = props.name;
     this.description = props.description ?? '';
     this.isActive = props.isActive ?? true;

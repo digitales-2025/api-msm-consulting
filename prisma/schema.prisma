@@ -80,7 +80,7 @@ model RolePermission {
 // Servicios
 model Service {
   id          String      @id @default(uuid())
-  name        String      @unique
+  name        String
   description String?
   isActive    Boolean     @default(true)
   isGlobal    Boolean     @default(true)
