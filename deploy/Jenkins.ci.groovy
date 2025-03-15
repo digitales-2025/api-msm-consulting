@@ -19,6 +19,7 @@ pipeline {
         }
         stage('Build project') {
             steps {
+                sh 'pnpm dlx prisma generate'
                 sh 'pnpm run build'
             }
         }
